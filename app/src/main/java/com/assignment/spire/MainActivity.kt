@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
@@ -61,11 +62,14 @@ fun StoreNavHost(
     productViewModel: ProductViewModel,
     cartViewModel: CartViewModel
 ) {
+    val cartItemCount by cartViewModel.itemCount.collectAsState()
+
     NavHost(navController = navController, startDestination = "productList") {
 
         composable("productList") {
             ProductListScreen(
                 viewModel = productViewModel,
+                cartItemCount = cartItemCount, // Pass count
                 onProductClick = { product ->
                     navController.navigate("productDetails/${product.id}")
                 },
@@ -85,6 +89,7 @@ fun StoreNavHost(
             if (product != null) {
                 ProductDetailScreen(
                     product = product,
+                    cartItemCount = cartItemCount, // Pass count
                     onAddToCart = { cartViewModel.addProductToCart(product) },
                     onNavigateUp = { navController.navigateUp() },
                     onNavigateToCart = { navController.navigate("cart") }
