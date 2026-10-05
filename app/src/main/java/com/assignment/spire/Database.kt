@@ -20,11 +20,13 @@ interface CartDao {
     @Query("SELECT * FROM cart_items WHERE id = :productId LIMIT 1")
     suspend fun getCartItemById(productId: Int): CartItem?
 
+    // Change this to return Long (the inserted row ID)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(item: CartItem)
+    suspend fun insertOrUpdate(item: CartItem): Long
 
+    // Change this to return Int (the number of rows deleted)
     @Delete
-    suspend fun delete(item: CartItem)
+    suspend fun delete(item: CartItem): Int
 }
 
 @Database(entities = [CartItem::class], version = 1, exportSchema = false)

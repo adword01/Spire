@@ -2,6 +2,8 @@ package com.assignment.spire
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -9,10 +11,22 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     private val _uiState = MutableStateFlow<Resource<List<Product>>>(Resource.Loading())
     val uiState: StateFlow<Resource<List<Product>>> = _uiState
 
+    private var searchJob: Job? = null
+
     init {
         loadProducts()
     }
 
+    // Call this from the UI when text changes
+    fun searchProducts(query: String) {
+        searchJob?.cancel() // Cancel the previous countdown if the user is still typing
+        searchJob = viewModelScope.launch {
+            delay(500L) // Wait 500 milliseconds
+            loadProducts(query) // Only fetch if the 500ms completes without cancellation
+        }
+    }
+
+    // Make this private or keep it public for explicit retry actions
     fun loadProducts(query: String = "") {
         viewModelScope.launch {
             _uiState.value = Resource.Loading()
